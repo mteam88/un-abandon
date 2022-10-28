@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{template "partials/head" .}}
+    <title>Un-Abandon</title>
+</head>
+
+<body>
+    {{template "partials/navbar" .}}
+    <div class="container">
+    <h1 class="header"> {{.Header}} </h1>
+    {{ embed }}
+    </div>
+    {{template "partials/loadjs" .}}
+</body>
+
+</html>

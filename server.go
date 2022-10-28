@@ -2,22 +2,26 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2" // gofiber import
-	"github.com/gofiber/template/mustache" // mustache template import
+	"github.com/gofiber/template/html" // mustache template import
 )
 
 func main() {
 // init fiber app
 	app := fiber.New(fiber.Config{
-		Views: mustache.New("./views", ".mustache"),
+		Views: html.New("./views", ".html"), // set the views directory
 	})
 // define route
 	app.Get("/", func(c *fiber.Ctx) error {
 		// return index.html
-		return c.Render("index", fiber.Map{})
+		return c.Render("index", fiber.Map{
+			"Header": "Un-Abandon",
+		}, "layouts/main")
 	})
 	app.Get("/explore", func(c *fiber.Ctx) error {
 		// return index.html
-		return c.Render("explore", fiber.Map{})
+		return c.Render("explore", fiber.Map{
+			"Header": "Explore",
+		}, "layouts/main")
 	})
 // serve static files
 	app.Static("/", "./static/public")
