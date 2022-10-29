@@ -23,6 +23,12 @@ func main() {
 			"Header": "Explore",
 		}, "layouts/main")
 	})
+	app.Get("/install", func(c *fiber.Ctx) error {
+		// return index.html
+		return c.Render("install", fiber.Map{
+			"Header": "Install",
+		}, "layouts/main")
+	})
 // serve static files
 	app.Static("/", "./static/public")
 // start server
