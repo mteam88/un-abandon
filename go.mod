@@ -1,4 +1,4 @@
-module unabandon
+module github.com/mteamm88/un-abandon
 
 go 1.19
 
