@@ -1,6 +1,8 @@
-module github.com/mteamm88/un-abandon
+module github.com/mteam88/un-abandon
 
 go 1.19
+
+replace github.com/mteam88/un-abandon => ./un-abandon
 
 require (
 	github.com/gofiber/fiber/v2 v2.39.0
