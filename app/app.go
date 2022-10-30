@@ -3,13 +3,18 @@ package app
 import (
 	"strconv"
 
+	"github.com/mteam88/un-abandon/database"
+
 	"github.com/gofiber/fiber/v2"      // gofiber import
 	"github.com/gofiber/template/html" // mustache template import
 )
 
 var app *fiber.App
+var db *database.MemDB
 
 func Setup() {
+	db = database.NewMemDB()
+
 	// init fiber app
 	app = fiber.New(fiber.Config{
 		Views: html.New("./web/views", ".html"), // set the views directory
