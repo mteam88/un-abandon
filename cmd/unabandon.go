@@ -7,4 +7,5 @@ import (
 func main() {
 	app.Setup()
 	app.Start(3000)
+	select {}
 }
