@@ -5,44 +5,46 @@ import (
 
 	"github.com/mteam88/un-abandon/database"
 
-	"github.com/gofiber/fiber/v2"      // gofiber import
+	"github.com/gofiber/fiber/v2" // gofiber import
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html" // mustache template import
 )
 
-var app *fiber.App
-var db *database.MemDB
+var App *fiber.App
+var DB *database.MemDB
 
 func Setup() {
-	db = database.NewMemDB()
+	DB = database.NewMemDB()
 
+	
 	// init fiber app
-	app = fiber.New(fiber.Config{
+	App = fiber.New(fiber.Config{
 		Views: html.New("./web/views", ".html"), // set the views directory
 	})
+
+	// use logger middleware
+	App.Use(logger.New())
+	
 	// define route
-	app.Get("/", func(c *fiber.Ctx) error {
+	App.Get("/", func(c *fiber.Ctx) error {
 		// return index.html
 		return c.Render("index", fiber.Map{
 			"Header": "Un-Abandon",
 		}, "layouts/main")
 	})
-	app.Get("/explore", func(c *fiber.Ctx) error {
+	App.Get("/explore", func(c *fiber.Ctx) error {
 		// return index.html
 		return c.Render("explore", fiber.Map{
 			"Header": "Explore",
 		}, "layouts/main")
 	})
-	app.Get("/install", func(c *fiber.Ctx) error {
-		// return index.html
-		return c.Render("install", fiber.Map{
-			"Header": "Install",
-		}, "layouts/main")
-	})
+	InstallSetup()
 	// serve static files
-	app.Static("/", "./web/static/public")
+	App.Static("/", "./web/static/public")
+
 }
 
 func Start(port int) {
 	// start server
-	app.Listen(":" + strconv.Itoa(port))
+	App.Listen(":" + strconv.Itoa(port))
 }
