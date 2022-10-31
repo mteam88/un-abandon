@@ -11,12 +11,12 @@ import (
 func TestMemDB(t *testing.T) {
 	db := NewMemDB()
 
-	err := db.Set("key", "value")
+	err := db.Set("key", []byte{1,2,3})
 	assert.Nil(t, err)
 
 	val, err := db.Get("key")
 	assert.Nil(t, err)
-	assert.Equal(t, "value", val)
+	assert.Equal(t, []byte{1,2,3}, val)
 
 	err = db.Delete("key")
 	assert.Nil(t, err)

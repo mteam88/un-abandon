@@ -6,27 +6,27 @@ import (
 
 // MemDB is a simple in-memory database
 type MemDB struct {
-	data map[string]string
+	data map[string][]byte
 }
 
 // NewMemDB creates a new MemDB
 func NewMemDB() *MemDB {
 	return &MemDB{
-		data: make(map[string]string),
+		data: make(map[string][]byte),
 	}
 }
 
 // Get returns the value for a given key
-func (db *MemDB) Get(key string) (string, error) {
+func (db *MemDB) Get(key string) ([]byte, error) {
 	val, ok := db.data[key]
 	if !ok {
-		return "", fmt.Errorf("key not found")
+		return []byte{}, fmt.Errorf("key not found")
 	}
 	return val, nil
 }
 
 // Set sets the value for a given key
-func (db *MemDB) Set(key, val string) error {
+func (db *MemDB) Set(key string, val []byte) error {
 	db.data[key] = val
 	return nil
 }
