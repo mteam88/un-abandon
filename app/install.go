@@ -101,6 +101,13 @@ func InstallSetup() {
 		}
 		DB.Set("users", users)
 
+		// set cookie
+		c.Cookie(&fiber.Cookie{
+			Name: "github_token",
+			Value: token,
+			HTTPOnly: true,
+		})
+
 		// redirect user to home page
 		return c.Redirect("/", 302)
 	})

@@ -7,14 +7,10 @@ import (
 	"golang.org/x/oauth2"
 	"github.com/google/go-github/v48/github"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
+	_ "github.com/gofiber/fiber/v2/middleware/session"
 )
 
 func AuthSetup() {
-	// init session
-	store := session.New()
-	App.Use(store)
-
 	// define middleware
 	App.Use(AuthenticateUser)
 }
@@ -22,6 +18,7 @@ func AuthSetup() {
 func AuthenticateUser(c *fiber.Ctx) error {
 	// check that user is authenticated to github
 	// if not, redirect to /install
+	log.Print("Authenticating user: " + c.Path() + " token: " + c.Cookies("github_token"))
 	if c.Path() == "/dashboard" {
 		if c.Cookies("github_token") == "" {
 			return c.Redirect("/install")
@@ -31,9 +28,9 @@ func AuthenticateUser(c *fiber.Ctx) error {
 			}
 			return c.Redirect("/install")
 		}
-	} else {
-		return c.Next()
 	}
+	c.Next()
+	return nil
 }
 
 func CheckGHOauthToken(token string) (ok bool) {

@@ -31,6 +31,9 @@ func Setup() {
 	// use logger middleware
 	App.Use(logger.New())
 	
+	//setup middleware
+	AuthSetup()
+	
 	// define route
 	App.Get("/", func(c *fiber.Ctx) error {
 		// return index.html
