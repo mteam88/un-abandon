@@ -45,6 +45,7 @@ func Setup() {
 		}, "layouts/main")
 	})
 	InstallSetup()
+	DashboardSetup()
 	// serve static files
 	App.Static("/", "./web/static/public")
 

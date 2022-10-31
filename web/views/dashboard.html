@@ -1,0 +1,11 @@
+<!-- get the user's github username from a form
+then redirect them to /dashboard/ + the provided username -->
+
+<textarea id="uname" class="center textarea" aria-placeholder="Your Github username"></textarea>
+<button id="submit" class="center btn btn-primary" onclick="submit();">Submit</button>
+<script>
+    function submit() {
+        var uname = document.getElementById("uname").value;
+        window.location.href = "/dashboard/" + uname;
+    }
+</script>
