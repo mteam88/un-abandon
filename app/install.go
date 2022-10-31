@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"context"
 	"os"
-	"io/ioutil"
+	"io"
 
 	"github.com/mteam88/un-abandon/database"
 
@@ -42,7 +42,7 @@ func GetOauthToken(code string) (token string, err error) {
 	}
 
 	body := make(map[string]interface{})
-	rawBody,err := ioutil.ReadAll(res.Body)
+	rawBody,err := io.ReadAll(res.Body)
 	json.Unmarshal(rawBody, &body)
 	
 	if err != nil {
