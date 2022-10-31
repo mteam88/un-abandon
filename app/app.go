@@ -2,6 +2,7 @@ package app
 
 import (
 	"strconv"
+	"encoding/json"
 
 	"github.com/mteam88/un-abandon/database"
 
@@ -15,6 +16,11 @@ var DB *database.MemDB
 
 func Setup() {
 	DB = database.NewMemDB()
+	users, err := json.Marshal([]database.User{})
+	if err != nil {
+		panic(err)
+	}
+	DB.Set("users", users)
 
 	
 	// init fiber app

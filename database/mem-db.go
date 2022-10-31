@@ -9,6 +9,12 @@ type MemDB struct {
 	data map[string][]byte
 }
 
+type User struct {
+	Username string
+	Token	string
+	GithubID int64
+}
+
 // NewMemDB creates a new MemDB
 func NewMemDB() *MemDB {
 	return &MemDB{
