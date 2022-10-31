@@ -4,8 +4,6 @@ import (
 	"log"
 	"context"
 
-	"golang.org/x/oauth2"
-	"github.com/google/go-github/v48/github"
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/gofiber/fiber/v2/middleware/session"
 )
@@ -36,12 +34,7 @@ func AuthenticateUser(c *fiber.Ctx) error {
 func CheckGHOauthToken(token string) (ok bool) {
 	// check that token is valid
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
+	client := GetGithubClient(ctx, token)
 
 	// check that client is authenticated
 	_, _, err := client.Users.Get(ctx, "")

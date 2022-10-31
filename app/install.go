@@ -11,9 +11,7 @@ import (
 
 	"github.com/mteam88/un-abandon/database"
 
-	"golang.org/x/oauth2"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/google/go-github/v48/github"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -68,13 +66,8 @@ func InstallSetup() {
 		}
 
 		ctx := context.Background()
-		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: token},
-		)
-		tc := oauth2.NewClient(ctx, ts)
-	
-		client := github.NewClient(tc)
-	
+		client := GetGithubClient(ctx, c.Cookies("github_token"))
+
 		// list user info for authenticated user
 		user, _, err := client.Users.Get(ctx, "")
 		if err != nil {
