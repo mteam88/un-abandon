@@ -12,3 +12,34 @@
 <div class="github-widget" data-user={{ .Username }}></div>
 
 <script src="assets/github-widget/github-widget.min.js"></script>
+
+<script>
+    // for each generated repo, create a new button to abandon it
+    // the generated repos have the classname: gw-repo-outer
+    // the button should be a <button> element that is created by the script
+
+    // the abandon button is a child of the gw-repo-outer div
+    // so we can use the parent selector to find the gw-repo-outer div
+    // and then use the child selector to find the gw-repo-abandon button
+
+    function abandonRepo(repo) {
+        alert("abandoning repo: " + JSON.stringify(repo) + " NOT IMPLEMENTED");
+    }
+
+    function addAbandonButtons() {
+        repos = document.getElementsByClassName("gw-repo-outer");
+        // alert(repos.length);
+        for (let i = 0; i < repos.length; i++) {
+            let button = document.createElement("button");
+            button.className = "gw-repo-abandon";
+            button.innerText = "Abandon";
+            button.addEventListener("click", abandonRepo);
+            repos[i].appendChild(button)
+        }
+    }
+
+    // run this function when the page loads with event listener
+    window.addEventListener("load", addAbandonButtons)
+    
+
+</script>
