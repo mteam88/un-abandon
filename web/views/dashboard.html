@@ -23,7 +23,27 @@
     // and then use the child selector to find the gw-repo-abandon button
 
     function abandonRepo(repo) {
-        alert("abandoning repo: " + JSON.stringify(repo) + " NOT IMPLEMENTED");
+        // the repo parameter is the gw-repo-outer div
+        // get the url of the repo from the element with the class gw-name that is a child of the gw-repo-outer div
+        // use the url to call the abandon endpoint
+        // here is the implementation
+        url = repo.querySelector(".gw-name").href;
+        alert(url);
+        fetch("/dashboard/abandon", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "url": url
+            })
+        }).then(response => {
+            if (response.ok) {
+                alert("Repo abandoned");
+            } else {
+                alert("Repo not abandoned");
+            }
+        });
     }
 
     function addAbandonButtons() {
@@ -33,7 +53,9 @@
             let button = document.createElement("button");
             button.className = "gw-repo-abandon";
             button.innerText = "Abandon";
-            button.addEventListener("click", abandonRepo);
+            button.onclick = function(evt) {
+                abandonRepo(evt.target.parentElement);
+            }
             repos[i].appendChild(button)
         }
     }
