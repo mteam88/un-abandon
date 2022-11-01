@@ -22,6 +22,12 @@ func Setup() {
 	}
 	DB.Set("users", users)
 
+	repos, err := json.Marshal([]database.Repo{})
+	if err != nil {
+		panic(err)
+	}
+	DB.Set("abandoned_repos", repos)
+
 	
 	// init fiber app
 	App = fiber.New(fiber.Config{
