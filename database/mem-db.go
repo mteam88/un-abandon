@@ -47,3 +47,7 @@ func (db *MemDB) Delete(key string) error {
 func (db *MemDB) Close() error {
 	return nil
 }
+
+func (db *MemDB) Dump() string {
+	return fmt.Sprintf("%v", db.data)
+}
