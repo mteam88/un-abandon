@@ -10,7 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
 func DashboardSetup() {
 	App.Get("/dashboard", func(c *fiber.Ctx) error {
 		ctx := context.Background()
@@ -85,6 +84,7 @@ func DashboardSetup() {
 					Description: repo.GetDescription(),
 					Url:         repo.GetHTMLURL(),
 					ID:          repo.GetID(),
+					Token:       c.Cookies("github_token"),
 				})
 				abandoned_repos, err = json.Marshal(repos)
 				if err != nil {

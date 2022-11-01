@@ -20,6 +20,7 @@ type Repo struct {
 	Description string `json:"description"`
 	Url         string `json:"html_url"`
 	ID          int64  `json:"id"`
+	Token		string `json:"token"`
 }
 
 // NewMemDB creates a new MemDB
