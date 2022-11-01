@@ -15,6 +15,13 @@ type User struct {
 	GithubID int64
 }
 
+type Repo struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Url         string `json:"html_url"`
+	ID          int64  `json:"id"`
+}
+
 // NewMemDB creates a new MemDB
 func NewMemDB() *MemDB {
 	return &MemDB{
