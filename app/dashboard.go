@@ -11,6 +11,7 @@ type Repo struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
 		Url         string `json:"html_url"`
+		ID		    int64 `json:"id"`
 }
 
 func DashboardSetup() {
@@ -31,6 +32,7 @@ func DashboardSetup() {
 				Name:        repo.GetName(),
 				Description: repo.GetDescription(),
 				Url:         repo.GetHTMLURL(),
+				ID:		  repo.GetID(),
 			})
 		}
 
