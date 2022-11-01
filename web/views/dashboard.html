@@ -1,1 +1,18 @@
-{{ .Repos }}
+<script type="module">
+    import { createApp } from 'https://unpkg.com/petite-vue?module'
+
+    createApp({
+        $delimiters: ['[[', ']]'],
+        // exposed to all expressions
+        repos: {{ .Repos }},
+    }).mount()
+</script>
+
+<!-- v-scope value can be omitted -->
+<div v-scope>
+    <h1>[[ repos.length ]] repositories</h1>
+    <div v-for="repo in repos">
+        <a :href="repo.html_url">[[ repo.name ]]</a>
+        <p>[[repo.description]]</p>
+    </div>
+</div>
