@@ -47,12 +47,7 @@ func Setup() {
 			"Header": "Un-Abandon",
 		}, "layouts/main")
 	})
-	App.Get("/explore", func(c *fiber.Ctx) error {
-		// return index.html
-		return c.Render("explore", fiber.Map{
-			"Header": "Explore",
-		}, "layouts/main")
-	})
+	ExploreSetup()
 	InstallSetup()
 	DashboardSetup()
 	// serve static files
