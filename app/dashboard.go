@@ -34,9 +34,16 @@ func DashboardSetup() {
 			})
 		}
 
+		user, _, err := client.Users.Get(ctx, "")
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+
 		return c.Render("dashboard", fiber.Map{
 			"Header": "Dashboard",
 			"Repos": cleanRepos,
+			"Username": user.Login,
 		}, "layouts/main")
 	})
 }

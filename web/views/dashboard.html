@@ -4,15 +4,11 @@
     createApp({
         $delimiters: ['[[', ']]'],
         // exposed to all expressions
-        repos: {{ .Repos }},
+        repos: {{ .Repos }}, // don't mind errors, they are from the template engine
     }).mount()
 </script>
 
-<!-- v-scope value can be omitted -->
-<div v-scope>
-    <h1>[[ repos.length ]] repositories</h1>
-    <div v-for="repo in repos">
-        <a :href="repo.html_url">[[ repo.name ]]</a>
-        <p>[[repo.description]]</p>
-    </div>
-</div>
+<link href="assets/github-widget/github-widget.css" rel="stylesheet" type="text/css" />
+<div class="github-widget" data-user={{ .Username }}></div>
+
+<script src="assets/github-widget/github-widget.min.js"></script>
