@@ -51,6 +51,7 @@ func Setup() {
 	DashboardSetup()
 	// serve static files
 	App.Static("/", "./web/static/public")
+	App.Static("/assets", "./web/static/assets")
 
 }
 
