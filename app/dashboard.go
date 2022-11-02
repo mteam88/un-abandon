@@ -12,7 +12,7 @@ import (
 )
 
 func DashboardSetup() {
-	DashboardGroup := App.Group("/dashboard")
+	DashboardGroup := App.Group("/dashboard", AuthenticateUser)
 
 	DashboardGroup.Get("/", func(c *fiber.Ctx) error {
 		ctx := context.Background()

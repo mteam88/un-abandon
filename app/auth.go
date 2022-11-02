@@ -8,27 +8,18 @@ import (
 	_ "github.com/gofiber/fiber/v2/middleware/session"
 )
 
-func AuthSetup() {
-	// define middleware
-	App.Use(AuthenticateUser)
-}
-
 func AuthenticateUser(c *fiber.Ctx) error {
 	// check that user is authenticated to github
 	// if not, redirect to /install
 	log.Print("Authenticating user: " + c.Path() + " token: " + c.Cookies("github_token"))
-	if c.Path() == "/dashboard" {
-		if c.Cookies("github_token") == "" {
-			return c.Redirect("/install")
-		} else {
-			if (CheckGHOauthToken(c.Cookies("github_token"))) {
-				return c.Next()
-			}
-			return c.Redirect("/install")
+	if c.Cookies("github_token") == "" {
+		return c.Redirect("/install")
+	} else {
+		if (CheckGHOauthToken(c.Cookies("github_token"))) {
+			return c.Next()
 		}
+		return c.Redirect("/install")
 	}
-	c.Next()
-	return nil
 }
 
 func CheckGHOauthToken(token string) (ok bool) {
