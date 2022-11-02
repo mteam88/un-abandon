@@ -42,6 +42,8 @@ func GetOauthToken(code string) (token string, err error) {
 	body := make(map[string]interface{})
 	rawBody,err := io.ReadAll(res.Body)
 	json.Unmarshal(rawBody, &body)
+
+	log.Print(body)
 	
 	if err != nil {
 		log.Print(err)
@@ -65,8 +67,10 @@ func InstallSetup() {
 			return err
 		}
 
+		log.Print(token)
+
 		ctx := context.Background()
-		client := GetGithubClient(ctx, c.Cookies("github_token"))
+		client := GetGithubClient(ctx, token)
 
 		// list user info for authenticated user
 		user, _, err := client.Users.Get(ctx, "")
