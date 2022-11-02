@@ -6,7 +6,9 @@ import (
 
 func ExploreSetup() {
 	// define route
-	App.Get("/explore", func(c *fiber.Ctx) error {
+	ExploreGroup := App.Group("/explore")
+
+	ExploreGroup.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("explore", fiber.Map{
 			"Header": "Explore",
 		}, "layouts/main")

@@ -12,7 +12,9 @@ import (
 )
 
 func DashboardSetup() {
-	App.Get("/dashboard", func(c *fiber.Ctx) error {
+	DashboardGroup := App.Group("/dashboard")
+
+	DashboardGroup.Get("/", func(c *fiber.Ctx) error {
 		ctx := context.Background()
 		client := GetGithubClient(ctx, c.Cookies("github_token"))
 
@@ -46,7 +48,7 @@ func DashboardSetup() {
 		}, "layouts/main")
 	})
 
-	App.Post("/dashboard/abandon/", func(c *fiber.Ctx) error {
+	DashboardGroup.Post("/abandon/", func(c *fiber.Ctx) error {
 		ctx := context.Background()
 		client := GetGithubClient(ctx, c.Cookies("github_token"))
 
@@ -103,7 +105,7 @@ func DashboardSetup() {
 		return c.Redirect("/dashboard")
 	})
 
-	App.Post("/dashboard/adopt/", func(c *fiber.Ctx) error {
+	DashboardGroup.Post("/adopt/", func(c *fiber.Ctx) error {
 		ctx := context.Background()
 		client := GetGithubClient(ctx, c.Cookies("github_token"))
 

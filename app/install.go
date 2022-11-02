@@ -54,11 +54,12 @@ func GetOauthToken(code string) (token string, err error) {
 }
 
 func InstallSetup() {
-	App.Get("/install", func(c *fiber.Ctx) error {
+	InstallGroup := App.Group("/install")
+	InstallGroup.Get("/", func(c *fiber.Ctx) error {
 		// return index.html
 		return c.Redirect("https://github.com/login/oauth/authorize?client_id=064a76c57f88a8d1b666&scope=user,public_repo")
 	})
-	App.Get("/install/callback", func(c *fiber.Ctx) error {
+	InstallGroup.Get("/install/callback", func(c *fiber.Ctx) error {
 		// return index.html
 		code := c.Query("code")
 		token, err := GetOauthToken(code)
