@@ -56,7 +56,7 @@ func DashboardSetup() {
 			Url string `json:"url"`
 		}
 
-		err := json.Unmarshal(c.Body(), url)
+		err := json.Unmarshal(c.Body(), &url)
 		if err != nil {
 			log.Print(err)
 			return err
