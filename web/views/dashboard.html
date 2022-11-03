@@ -1,9 +1,22 @@
 <script type="module">
     import { createApp } from 'https://unpkg.com/petite-vue?module'
 
-    createApp({
+    app = createApp({
         $delimiters: ['[[', ']]'],
         // exposed to all expressions
         repos: {{ .Repos }}, // don't mind errors, they are from the template engine
-    }).mount()
+    })
+
+    app.config.errorHandler = (err) => {
+        alert(err.message)
+    }
+
+    app.mount()
 </script>
+<div>
+    <h1>[[ repos.length ]] Repositories</h1>
+    <div v-for="repo in repos">
+        <h2 class="header">[[ repo.name ]]</h2>
+        <a :href="repo.html_url">[[ repo.name ]]</a>
+    </div>
+</div>
