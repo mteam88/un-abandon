@@ -1,16 +1,24 @@
-<script type="module">
-    import { createApp } from 'https://unpkg.com/petite-vue?module'
+<!--
+Here we show the simplest possible component which accepts a prop and renders it.
+Learn more about components in the guide!
+-->
 
+<script type="module">
+    import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0-beta.14/vue.esm-browser.js';
+    import GithubRepo from './GithubRepo.js'
+    
     createApp({
-        $delimiters: ['[[', ']]'],
-        // exposed to all expressions
-        repos: {{ .Repos }}, // don't mind errors, they are from the template engine
-    }).mount()
+        components: {
+            GithubRepo
+        },
+        data() {
+            return {
+                repos: {{ .Repos }}
+            }
+        }
+    }).mount('#app')
 </script>
-<div>
-    <h1>[[ repos.length ]] Repositories</h1>
-    <div v-for="repo in repos">
-        <h2 class="header">[[ repo.name ]]</h2>
-        <a :href="repo.html_url">[[ repo.name ]]</a>
-    </div>
+    
+<div id="app">
+    <github-repo v-for="repo in repos" :repo="repo"></github-repo>
 </div>
