@@ -1,1 +1,63 @@
-<h3 class="">explore abandoned projects</h3>
+<!--
+Here we show the simplest possible component which accepts a prop and renders it.
+Learn more about components in the guide!
+-->
+
+<script type="module">
+    import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0-beta.14/vue.esm-browser.js';
+    import GithubRepo from './GithubRepo.js'
+
+    createApp({
+        components: {
+            GithubRepo
+        },
+        // define function to abandon repo
+        methods: {
+            adoptRepo(repo) {
+                // remove repo from list
+                this.repos = this.repos.filter(r => r.id !== repo.id)
+                // send request to abandon repo
+                var url = repo.html_url
+                alert(url);
+                fetch("/dashboard/adopt/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "url": url
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert("Repo adopted!");
+                    } else {
+                        alert("Repo not adopted ):");
+                    }
+                });
+            }
+
+        },
+        data() {
+        return {
+            repos: {{ .Repos }}
+            }
+        }
+    }).mount('#app')
+</script>
+
+<div id="app">
+    <div class="card-columns">
+        <github-repo 
+        v-for="repo in repos" 
+        :repo="repo"
+        buttontext="Adopt"
+        @button-clicked="adoptRepo(repo)">
+    </github-repo>
+    </div>
+</div>
+
+<style>
+    .card-columns {
+        column-count: 3;
+    }
+</style>
