@@ -6,19 +6,54 @@ Learn more about components in the guide!
 <script type="module">
     import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0-beta.14/vue.esm-browser.js';
     import GithubRepo from './GithubRepo.js'
-    
+
     createApp({
         components: {
             GithubRepo
         },
+        // define function to abandon repo
+        methods: {
+            abandonRepo(repo) {
+                // remove repo from list
+                this.repos = this.repos.filter(r => r.id !== repo.id)
+                // send request to abandon repo
+                url = repo.url;
+                alert(url);
+                fetch("/dashboard/abandon/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "url": url
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert("Repo abandoned");
+                    } else {
+                        alert("Repo not abandoned");
+                    }
+                });
+            }
+
+        }
+    },
         data() {
-            return {
-                repos: {{ .Repos }}
+        return {
+            repos: {{ .Repos }}
             }
         }
     }).mount('#app')
 </script>
-    
+
 <div id="app">
-    <github-repo v-for="repo in repos" :repo="repo"></github-repo>
+    <div class="card-columns">
+        <github-repo v-for="repo in repos" :repo="repo"></github-repo>
+    </div>
 </div>
+
+<style>
+    .card-columns {
+        column-count: 3;
+    }
+</style>
