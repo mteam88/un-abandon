@@ -1,7 +1,11 @@
 package app
 
 import (
+	"encoding/json"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/mteam88/un-abandon/database"
 )
 
 func ExploreSetup() {
@@ -9,34 +13,21 @@ func ExploreSetup() {
 	ExploreGroup := App.Group("/explore")
 
 	ExploreGroup.Get("/", func(c *fiber.Ctx) error {
-		ctx := context.Background()
-		client := GetGithubClient(ctx, c.Cookies("github_token"))
-
-		repos, _, err := client.Repositories.List(ctx, "", nil)
-
+		// get all repos from database
+		repos, err := DB.Get("abandoned_repos")
 		if err != nil {
 			log.Print(err)
 			return err
 		}
-		// clean repos object to only include name, url and description
-		var cleanRepos []database.Repo = []database.Repo{}
-		for _, repo := range repos {
-			cleanRepos = append(cleanRepos, database.Repo{
-				Name:        repo.GetName(),
-				Description: repo.GetDescription(),
-				Url:         repo.GetHTMLURL(),
-				ID:          repo.GetID(),
-			})
-		}
 
-		user, _, err := client.Users.Get(ctx, "")
-		if err != nil {
-			log.Print(err)
-			return err
-		}
+		var cleanRepos []database.Repo
+		json.Unmarshal(repos, &cleanRepos)
+
+		log.Print(cleanRepos)
 
 		return c.Render("explore", fiber.Map{
 			"Header": "Explore",
+			"Repos":  cleanRepos,
 		}, "layouts/main")
 	})
 }

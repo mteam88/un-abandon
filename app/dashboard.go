@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
+	"strings"
 
 	"github.com/mteam88/un-abandon/database"
 
@@ -113,7 +115,7 @@ func DashboardSetup() {
 			Url string `json:"url"`
 		}
 
-		err := json.Unmarshal(c.Body(), url)
+		err := json.Unmarshal(c.Body(), &url)
 		if err != nil {
 			log.Print(err)
 			return err
@@ -145,7 +147,7 @@ func DashboardSetup() {
 					log.Print(err)
 					return err
 				}
-				
+
 				err = TransferRepo(repo, client)
 				if err != nil {
 					log.Print(err)
@@ -154,28 +156,20 @@ func DashboardSetup() {
 			}
 		}
 
-		return c.Redirect("/dashboard")
+		// return ok
+		return c.SendStatus(200)
 	})
 }
-
 
 func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 	ctx := context.Background()
 	currentOwnerClient := GetGithubClient(ctx, dbrepo.Token)
 
-	// get repos
-	ghrepos, _, err := currentOwnerClient.Repositories.ListAll(ctx, nil)
+	// get repo by id
+	ghrepo, _, err := currentOwnerClient.Repositories.GetByID(ctx, dbrepo.ID)
 	if err != nil {
 		log.Print(err)
 		return err
-	}
-
-	// find repo that matches dbrepo
-	var ghrepo *github.Repository
-	for _, repo := range ghrepos {
-		if repo.GetID() == dbrepo.ID {
-			ghrepo = repo
-		}
 	}
 
 	// get new client username
@@ -185,14 +179,18 @@ func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 		return err
 	}
 	newOwnerUsername := newOwner.GetLogin()
-
 	// transfer repo
 	_, _, err = currentOwnerClient.Repositories.Transfer(ctx, ghrepo.GetOwner().GetLogin(), ghrepo.GetName(), github.TransferRequest{
 		NewOwner: newOwnerUsername,
 	})
 	if err != nil {
-		log.Print(err)
-		return err
+		if strings.Contains(err.Error(), "Repositories cannot be transferred to the original owner") {
+			// repo already transferred
+			return errors.New("repo cannot be transferred to original owner")
+		} else {
+			log.Print(err)
+			return err
+		}
 	}
 
 	return nil
