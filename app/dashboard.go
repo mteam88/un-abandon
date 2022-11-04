@@ -135,6 +135,11 @@ func DashboardSetup() {
 
 		for i, repo := range repos {
 			if repo.Url == url.Url {
+				err = TransferRepo(repo, client)
+				if err != nil {
+					log.Print(err)
+					return err
+				}
 				// remove repo from db
 				repos = append(repos[:i], repos[i+1:]...)
 				abandoned_repos, err = json.Marshal(repos)
@@ -143,12 +148,6 @@ func DashboardSetup() {
 					return err
 				}
 				err = DB.Set("abandoned_repos", abandoned_repos)
-				if err != nil {
-					log.Print(err)
-					return err
-				}
-
-				err = TransferRepo(repo, client)
 				if err != nil {
 					log.Print(err)
 					return err
