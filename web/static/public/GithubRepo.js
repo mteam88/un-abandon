@@ -1,13 +1,14 @@
 export default {
     props: {
-      repo: Object
+      repo: Object,
+      buttontext: String,
     },
     template: `
-    <div class="card">
+    <div class="card" style="column-break-inside: avoid;">
     <div class="card-body">
       <h5 class="card-title"><a :href="repo.url" target="_blank">{{ repo.name }}</a></h5>
       <p class="card-text">{{ repo.description }}</p>
-      <a class="btn btn-danger">Abandon</a>
+      <a class="btn btn-danger" @click="$emit('button-clicked')" >{{ buttontext }}</a>
     </div>
   </div>
     `

@@ -17,7 +17,7 @@ Learn more about components in the guide!
                 // remove repo from list
                 this.repos = this.repos.filter(r => r.id !== repo.id)
                 // send request to abandon repo
-                url = repo.url;
+                var url = repo.html_url
                 alert(url);
                 fetch("/dashboard/abandon/", {
                     method: 'POST',
@@ -36,8 +36,7 @@ Learn more about components in the guide!
                 });
             }
 
-        }
-    },
+        },
         data() {
         return {
             repos: {{ .Repos }}
@@ -48,7 +47,12 @@ Learn more about components in the guide!
 
 <div id="app">
     <div class="card-columns">
-        <github-repo v-for="repo in repos" :repo="repo"></github-repo>
+        <github-repo 
+        v-for="repo in repos" 
+        :repo="repo" 
+        buttontext="Abandon"
+        @button-clicked="abandonRepo(repo)">
+    </github-repo>
     </div>
 </div>
 
