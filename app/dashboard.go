@@ -26,15 +26,32 @@ func DashboardSetup() {
 			log.Print(err)
 			return err
 		}
+
+		abandonedRepos, err := GetAllAbandonedRepos()
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+
 		// clean repos object to only include name, url and description
 		var cleanRepos []database.Repo = []database.Repo{}
 		for _, repo := range repos {
-			cleanRepos = append(cleanRepos, database.Repo{
-				Name:        repo.GetName(),
-				Description: repo.GetDescription(),
-				Url:         repo.GetHTMLURL(),
-				ID:          repo.GetID(),
-			})
+			// check if repo.ID is in abandonedRepos
+			var found bool = false
+			for _, abandonedRepo := range abandonedRepos {
+				if repo.GetID() == abandonedRepo {
+					found = true
+					break
+				}
+			}
+			if !found {
+				cleanRepos = append(cleanRepos, database.Repo{
+					Name:        repo.GetName(),
+					Description: repo.GetDescription(),
+					Url:         repo.GetHTMLURL(),
+					ID:          repo.GetID(),
+				})
+			}
 		}
 
 		user, _, err := client.Users.Get(ctx, "")
@@ -193,4 +210,24 @@ func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 	}
 
 	return nil
+}
+
+func GetAllAbandonedRepos() ([]int64, error) {
+	abandoned_repos, err := DB.Get("abandoned_repos")
+	if err != nil {
+		log.Print(err)
+		return []int64{}, err
+	}
+	var repos []database.Repo
+	err = json.Unmarshal(abandoned_repos, &repos)
+	if err != nil {
+		log.Print(err)
+		return []int64{}, err
+	}
+
+	var id_abandoned_repos []int64
+	for _, repo := range repos {
+		id_abandoned_repos = append(id_abandoned_repos, repo.ID)
+	}
+	return id_abandoned_repos, nil
 }
