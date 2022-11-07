@@ -56,6 +56,10 @@ Learn more about components in the guide!
         @button-clicked="abandonRepo(repo)">
     </github-repo>
     </div>
+    <!-- if no repos, display message -->
+    <div v-if="repos.length == 0">
+        You have no repos to abandon. Go create one on <a href="https://github.com/new">GitHub!</a>
+    </div>
 </div>
 
 <style>

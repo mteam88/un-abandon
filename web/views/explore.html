@@ -57,6 +57,10 @@ Learn more about components in the guide!
         @button-clicked="adoptRepo(repo)">
     </github-repo>
     </div>
+    <!-- if no repos, display message -->
+    <div v-if="repos.length == 0">
+        There are no repos to adopt. Thats a good thing... right?
+    </div>
 </div>
 
 <style>
