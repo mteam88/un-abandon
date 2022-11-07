@@ -11,6 +11,7 @@ import (
 func ExploreSetup() {
 	// define route
 	ExploreGroup := App.Group("/explore")
+	ExploreGroup.Use(AuthenticateUser)
 
 	ExploreGroup.Get("/", func(c *fiber.Ctx) error {
 		// get all repos from database
