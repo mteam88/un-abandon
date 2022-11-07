@@ -20,7 +20,6 @@ Learn more about components in the guide!
                 this.repos = this.repos.filter(r => r.id !== repo.id)
                 // send request to abandon repo
                 var url = repo.html_url
-                alert(url);
                 fetch("/dashboard/adopt/", {
                     method: 'POST',
                     headers: {
