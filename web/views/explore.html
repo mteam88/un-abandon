@@ -6,10 +6,12 @@ Learn more about components in the guide!
 <script type="module">
     import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0-beta.14/vue.esm-browser.js';
     import GithubRepo from './GithubRepo.js'
+    import Alerts from './Alerts.js'
 
     createApp({
         components: {
-            GithubRepo
+            GithubRepo,
+            Alerts
         },
         // define function to abandon repo
         methods: {
@@ -29,9 +31,9 @@ Learn more about components in the guide!
                     })
                 }).then(response => {
                     if (response.ok) {
-                        alert("Repo adopted!");
+                        this.$refs.alerts.addAlert("success", "Successfully adopted repo " + url);
                     } else {
-                        alert("Repo not adopted ):");
+                        this.$refs.alerts.addAlert("danger", "Failed to adopt repo " + url);
                     }
                 });
             }
@@ -46,6 +48,7 @@ Learn more about components in the guide!
 </script>
 
 <div id="app">
+    <alerts ref="alerts"></alerts>
     <div class="card-columns">
         <github-repo 
         v-for="repo in repos" 
