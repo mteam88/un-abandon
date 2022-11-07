@@ -47,6 +47,11 @@ func Setup() {
 	ExploreSetup()
 	InstallSetup()
 	DashboardSetup()
+	App.Use(func(c *fiber.Ctx) error {
+		return c.Status(404).Render("404", fiber.Map{
+			"Header": "404",
+		}, "layouts/main")
+	})
 	// serve static files
 	App.Static("/", "./web/static/public")
 	App.Static("/assets", "./web/static/assets")
