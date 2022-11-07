@@ -8,17 +8,26 @@ Learn more about components in the guide!
     import GithubRepo from './GithubRepo.js'
 
     createApp({
+        $delimiters: ['${', '}'],
         components: {
             GithubRepo
         },
         // define function to abandon repo
         methods: {
+            addAlert: function (type, message) {
+                var alert = document.createElement('div');
+                alert.innerHTML =
+                    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+                this.$refs.alerts.appendChild(alert);
+            },
             abandonRepo(repo) {
                 // remove repo from list
                 this.repos = this.repos.filter(r => r.id !== repo.id)
                 // send request to abandon repo
                 var url = repo.html_url
-                alert(url);
                 fetch("/dashboard/abandon/", {
                     method: 'POST',
                     headers: {
@@ -29,9 +38,9 @@ Learn more about components in the guide!
                     })
                 }).then(response => {
                     if (response.ok) {
-                        alert("Repo abandoned");
+                        this.addAlert("success", "Successfully abandoned repo " + url)
                     } else {
-                        alert("Repo not abandoned");
+                        this.addAlert("danger", "Failed to abandon repo " + url)
                     }
                 });
             }
@@ -46,6 +55,7 @@ Learn more about components in the guide!
 </script>
 
 <div id="app">
+    <div ref="alerts"></div>
     <div class="card-columns">
         <github-repo 
         v-for="repo in repos" 
