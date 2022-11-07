@@ -6,23 +6,16 @@ Learn more about components in the guide!
 <script type="module">
     import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0-beta.14/vue.esm-browser.js';
     import GithubRepo from './GithubRepo.js'
+    import Alerts from './Alerts.js'
 
     createApp({
         $delimiters: ['${', '}'],
         components: {
-            GithubRepo
+            GithubRepo,
+            Alerts
         },
         // define function to abandon repo
         methods: {
-            addAlert: function (type, message) {
-                var alert = document.createElement('div');
-                alert.innerHTML =
-                    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>`;
-                this.$refs.alerts.appendChild(alert);
-            },
             abandonRepo(repo) {
                 // remove repo from list
                 this.repos = this.repos.filter(r => r.id !== repo.id)
@@ -38,9 +31,9 @@ Learn more about components in the guide!
                     })
                 }).then(response => {
                     if (response.ok) {
-                        this.addAlert("success", "Successfully abandoned repo " + url)
+                        this.$refs.alerts.addAlert("success", "Successfully abandoned repo " + url)
                     } else {
-                        this.addAlert("danger", "Failed to abandon repo " + url)
+                        this.$refs.alerts.addAlert("danger", "Failed to abandon repo " + url)
                     }
                 });
             }
@@ -55,7 +48,7 @@ Learn more about components in the guide!
 </script>
 
 <div id="app">
-    <div ref="alerts"></div>
+    <alerts ref="alerts"></alerts>
     <div class="card-columns">
         <github-repo 
         v-for="repo in repos" 
