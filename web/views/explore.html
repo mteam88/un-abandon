@@ -16,8 +16,6 @@ Learn more about components in the guide!
         // define function to abandon repo
         methods: {
             adoptRepo(repo) {
-                // remove repo from list
-                this.repos = this.repos.filter(r => r.id !== repo.id)
                 // send request to abandon repo
                 var url = repo.html_url
                 fetch("/dashboard/adopt/", {
@@ -30,7 +28,10 @@ Learn more about components in the guide!
                     })
                 }).then(response => {
                     if (response.ok) {
-                        this.$refs.alerts.addAlert("success", "Successfully adopted repo " + url);
+                        this.$refs.alerts.addAlert.;/p0'[
+                            ("success", "Successfully adopted repo " + url);
+                        // remove repo from list
+                        this.repos = this.repos.filter(r => r.id !== repo.id)
                     } else {
                         this.$refs.alerts.addAlert("danger", "Failed to adopt repo " + url);
                     }

@@ -16,8 +16,6 @@ Learn more about components in the guide!
         // define function to abandon repo
         methods: {
             abandonRepo(repo) {
-                // remove repo from list
-                this.repos = this.repos.filter(r => r.id !== repo.id)
                 // send request to abandon repo
                 var url = repo.html_url
                 fetch("/dashboard/abandon/", {
@@ -31,6 +29,8 @@ Learn more about components in the guide!
                 }).then(response => {
                     if (response.ok) {
                         this.$refs.alerts.addAlert("success", "Successfully abandoned repo " + url)
+                        // remove repo from list
+                        this.repos = this.repos.filter(r => r.id !== repo.id)
                     } else {
                         this.$refs.alerts.addAlert("danger", "Failed to abandon repo " + url)
                     }
@@ -39,8 +39,9 @@ Learn more about components in the guide!
 
         },
         data() {
-        return {
-            repos: {{ .Repos }}
+            return {
+                repos: {{ .Repos
+    }}
             }
         }
     }).mount('#app')
@@ -49,12 +50,8 @@ Learn more about components in the guide!
 <div id="app">
     <alerts ref="alerts"></alerts>
     <div class="card-columns">
-        <github-repo 
-        v-for="repo in repos" 
-        :repo="repo" 
-        buttontext="Abandon"
-        @button-clicked="abandonRepo(repo)">
-    </github-repo>
+        <github-repo v-for="repo in repos" :repo="repo" buttontext="Abandon" @button-clicked="abandonRepo(repo)">
+        </github-repo>
     </div>
     <!-- if no repos, display message -->
     <div v-if="repos.length == 0">
