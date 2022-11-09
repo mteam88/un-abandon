@@ -56,8 +56,11 @@ func GetOauthToken(code string) (token string, err error) {
 func InstallSetup() {
 	InstallGroup := App.Group("/install")
 	InstallGroup.Get("/", func(c *fiber.Ctx) error {
-		// return index.html
-		return c.Redirect("https://github.com/login/oauth/authorize?client_id=064a76c57f88a8d1b666&scope=user,public_repo")
+		if c.Cookies("github_token") != "" {
+			return c.Redirect("/dashboard")
+		} else {
+			return c.Redirect("https://github.com/login/oauth/authorize?client_id=064a76c57f88a8d1b666&scope=user,public_repo")
+		}
 	})
 	InstallGroup.Get("/callback", func(c *fiber.Ctx) error {
 		// return index.html
@@ -68,8 +71,6 @@ func InstallSetup() {
 			return err
 		}
 
-		log.Print(token)
-
 		ctx := context.Background()
 		client := GetGithubClient(ctx, token)
 
@@ -79,7 +80,6 @@ func InstallSetup() {
 			log.Print(err)
 			return err
 		}
-		log.Print("user:", *user)
 
 		// add token to db
 		var Users []database.User
@@ -105,6 +105,6 @@ func InstallSetup() {
 		})
 
 		// redirect user to home page
-		return c.Redirect("/", 302)
+		return c.Redirect("/dashboard", 302)
 	})
 }
