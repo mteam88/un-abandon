@@ -11,7 +11,7 @@ import (
 func AuthenticateUser(c *fiber.Ctx) error {
 	// check that user is authenticated to github
 	// if not, redirect to /install
-	log.Print("Authenticating user: " + c.Path() + " token: " + c.Cookies("github_token"))
+	log.Print("Authenticating user: " + c.Path())
 	if c.Cookies("github_token") == "" {
 		return c.Redirect("/install")
 	} else {

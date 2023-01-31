@@ -32,8 +32,6 @@ func GetOauthToken(code string) (token string, err error) {
     req.URL.RawQuery = q.Encode()
 	res, err := http.DefaultClient.Do(req)
 
-	log.Print(req)
-
 	if err != nil {
 		log.Print(err)
 		return "", err
@@ -42,8 +40,6 @@ func GetOauthToken(code string) (token string, err error) {
 	body := make(map[string]interface{})
 	rawBody,err := io.ReadAll(res.Body)
 	json.Unmarshal(rawBody, &body)
-
-	log.Print(body)
 	
 	if err != nil {
 		log.Print(err)
