@@ -203,7 +203,13 @@ func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 		if strings.Contains(err.Error(), "Repositories cannot be transferred to the original owner") {
 			// repo already transferred
 			return errors.New("repo cannot be transferred to original owner")
-		} else {
+		} else if strings.Contains(err.Error(), "job scheduled on GitHub side; try again later"){
+			log.Print(err)
+			return nil
+		} else if strings.Contains(err.Error(), "Repository has already been taken"){
+			log.Print(err)
+			return nil
+		}  else {
 			log.Print(err)
 			return err
 		}
