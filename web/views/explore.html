@@ -28,8 +28,7 @@ Learn more about components in the guide!
                     })
                 }).then(response => {
                     if (response.ok) {
-                        this.$refs.alerts.addAlert.;/p0'[
-                            ("success", "Successfully adopted repo " + url);
+                        this.$refs.alerts.addAlert("success", "Successfully adopted repo " + url);
                         // remove repo from list
                         this.repos = this.repos.filter(r => r.id !== repo.id)
                     } else {
