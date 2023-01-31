@@ -208,7 +208,7 @@ func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 			return nil
 		} else if strings.Contains(err.Error(), "Repository has already been taken"){
 			log.Print(err)
-			return nil
+			return err
 		}  else {
 			log.Print(err)
 			return err
