@@ -1,35 +1,36 @@
 package app
 
 import (
-	"net/http"
-	"log"
-	"net/url"
-	"encoding/json"
 	"context"
-	"os"
+	"encoding/json"
 	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
 
+	"github.com/dgraph-io/badger/v3"
 	"github.com/mteam88/un-abandon/database"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/gofiber/fiber/v2"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func GetOauthToken(code string) (token string, err error) {
-	req, err := http.NewRequest("POST","https://github.com/login/oauth/access_token", nil)
+	req, err := http.NewRequest("POST", "https://github.com/login/oauth/access_token", nil)
 	if err != nil {
 		return "", err
 	}
 
 	req.Header.Add("Accept", "application/json")
 
-    // or you can create new url.Values struct and encode that like so
-    q := url.Values{}
-    q.Add("client_id", os.Getenv("OAUTH_CLIENT_ID"))
-    q.Add("client_secret", os.Getenv("OAUTH_CLIENT_SECRET"))
+	// or you can create new url.Values struct and encode that like so
+	q := url.Values{}
+	q.Add("client_id", os.Getenv("OAUTH_CLIENT_ID"))
+	q.Add("client_secret", os.Getenv("OAUTH_CLIENT_SECRET"))
 	q.Add("code", code)
 
-    req.URL.RawQuery = q.Encode()
+	req.URL.RawQuery = q.Encode()
 	res, err := http.DefaultClient.Do(req)
 
 	if err != nil {
@@ -38,9 +39,9 @@ func GetOauthToken(code string) (token string, err error) {
 	}
 
 	body := make(map[string]interface{})
-	rawBody,err := io.ReadAll(res.Body)
+	rawBody, err := io.ReadAll(res.Body)
 	json.Unmarshal(rawBody, &body)
-	
+
 	if err != nil {
 		log.Print(err)
 		return "", err
@@ -73,26 +74,32 @@ func InstallSetup() {
 			return err
 		}
 
-		// add token to db
-		var Users []database.User
-		rawusers, err := DB.Get("users")
-		if err != nil {
-			log.Print(err)
-			return err
-		}
-		json.Unmarshal(rawusers, &Users)
-		Users = append(Users, database.User{Username: *user.Login, Token: token, GithubID: *user.ID})
-		users, err := json.Marshal(Users)
-		if err != nil {
-			log.Print(err)
-			return err
-		}
-		DB.Set("users", users)
+		DB.Update(func(txn *badger.Txn) error {
+			// add token to db
+			var Users []database.User
+			rawusers, err := txn.Get([]byte("users"))
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+			rawusers.Value(func(val []byte) error {
+				json.Unmarshal(val, &Users)
+				Users = append(Users, database.User{Username: *user.Login, Token: token, GithubID: *user.ID})
+				users, err := json.Marshal(Users)
+				if err != nil {
+					log.Print(err)
+					return err
+				}
+				txn.Set([]byte("users"), users)
+				return nil
+			})
+			return nil
+		})
 
 		// set cookie
 		c.Cookie(&fiber.Cookie{
-			Name: "github_token",
-			Value: token,
+			Name:     "github_token",
+			Value:    token,
 			HTTPOnly: true,
 		})
 

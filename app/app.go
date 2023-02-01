@@ -1,9 +1,10 @@
 package app
 
 import (
-	"strconv"
 	"encoding/json"
+	"strconv"
 
+	"github.com/dgraph-io/badger/v3"
 	"github.com/mteam88/un-abandon/database"
 
 	"github.com/gofiber/fiber/v2" // gofiber import
@@ -12,21 +13,33 @@ import (
 )
 
 var App *fiber.App
-var DB *database.MemDB
+var DB *badger.DB
 
 func Setup() {
-	DB = database.NewMemDB()
+	DB = database.NewBadgerDB()
 	users, err := json.Marshal([]database.User{})
 	if err != nil {
 		panic(err)
 	}
-	DB.Set("users", users)
+	err = DB.Update(func(txn *badger.Txn) error {
+		err := txn.Set([]byte("users"), users)
+		return err
+	  })
+	if err != nil {
+		panic(err)
+	}
 
 	repos, err := json.Marshal([]database.Repo{})
 	if err != nil {
 		panic(err)
 	}
-	DB.Set("abandoned_repos", repos)
+	err = DB.Update(func(txn *badger.Txn) error {
+		err := txn.Set([]byte("abandoned_repos"), repos)
+		return err
+	  })
+	if err != nil {
+		panic(err)
+	}
 
 	
 	// init fiber app
