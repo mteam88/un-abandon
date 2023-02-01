@@ -26,6 +26,9 @@ Meet Bob. Bob is a grown man with 4 kids but no time. He has a great idea for a 
 
 Now meet Alice. Alice is a young developer with a lot of free time. She is looking for a project to work on. She finds Bob's project on Un-Abandon and decides to take it over. She now has a project to work on, and Bob has sent his idea to the world.
 
+## Project Status
+In development. Not yet hosted.
+
 ## Contributing
 We welcome contributions from everyone. Please read our [contributing guidelines](CONTRIBUTING.md) to get started.
 
