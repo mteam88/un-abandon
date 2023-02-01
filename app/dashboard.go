@@ -120,9 +120,9 @@ func DashboardSetup() {
 							log.Print(err)
 							return err
 						}
-						return nil
+						return err
 					})
-					return nil
+					return err
 				})
 				if err != nil {
 					log.Print(err)
