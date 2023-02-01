@@ -175,6 +175,12 @@ func DashboardSetup() {
 		// return ok
 		return c.SendStatus(200)
 	})
+
+	// log out route
+	App.Get("/logout/", func(c *fiber.Ctx) error {
+		c.ClearCookie()
+		return c.Redirect("/")
+	})
 }
 
 func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
