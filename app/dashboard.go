@@ -147,13 +147,13 @@ func DashboardSetup() {
 			return err
 		}
 
-		DB.Update(func(txn *badger.Txn) error {
+		err = DB.Update(func(txn *badger.Txn) error {
 			abandoned_repos, err := txn.Get([]byte("abandoned_repos"))
 			if err != nil {
 				log.Print(err)
 				return err
 			}
-			abandoned_repos.Value(func(val []byte) error {
+			err = abandoned_repos.Value(func(val []byte) error {
 				var repos []database.Repo
 				err = json.Unmarshal(val, &repos)
 				if err != nil {
@@ -182,11 +182,14 @@ func DashboardSetup() {
 						}
 					}
 				}
-				return nil
+				return err
 			})
-			return nil
+			return err
 		})
-
+		if err != nil {
+			log.Print(err)
+			return err
+		}
 		// return ok
 		return c.SendStatus(200)
 	})
