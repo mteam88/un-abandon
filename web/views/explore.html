@@ -17,6 +17,7 @@ Learn more about components in the guide!
         methods: {
             adoptRepo(repo) {
                 // send request to abandon repo
+                var id = repo.id
                 var url = repo.html_url
                 fetch("/dashboard/adopt/", {
                     method: 'POST',
@@ -24,7 +25,7 @@ Learn more about components in the guide!
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "url": url
+                        "id": id
                     })
                 }).then(response => {
                     if (response.ok) {

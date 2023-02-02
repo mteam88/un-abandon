@@ -18,13 +18,14 @@ Learn more about components in the guide!
             abandonRepo(repo) {
                 // send request to abandon repo
                 var url = repo.html_url
+                var id = repo.id
                 fetch("/dashboard/abandon/", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "url": url
+                        "id": id
                     })
                 }).then(response => {
                     if (response.ok) {

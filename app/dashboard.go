@@ -34,7 +34,7 @@ func DashboardSetup() {
 			return err
 		}
 
-		// clean repos object to only include name, url and description
+		// clean repos object to only include id, name, url and description
 		var cleanRepos []database.Repo = []database.Repo{}
 		for _, repo := range repos {
 			// check if repo.ID is in abandonedRepos
@@ -72,82 +72,74 @@ func DashboardSetup() {
 		ctx := context.Background()
 		client := GetGithubClient(ctx, c.Cookies("github_token"))
 
-		var url struct {
-			Url string `json:"url"`
+		var id struct {
+			ID int64 `json:"id"`
 		}
 
-		err := json.Unmarshal(c.Body(), &url)
+		err := json.Unmarshal(c.Body(), &id)
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 
-		repos, _, err := client.Repositories.List(ctx, "", nil)
+		repo, _, err := client.Repositories.GetByID(ctx, id.ID)
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 
-		for _, repo := range repos {
-			if repo.GetHTMLURL() == url.Url {
-				// add repo to db
-				err := RepoDB.Update(func(txn *badger.Txn) error {
-						err := txn.Set(database.GetID(int32(repo.GetID())),database.Repo{
-							Name:        repo.GetName(),
-							Description: repo.GetDescription(),
-							Url:         repo.GetHTMLURL(),
-							ID:          repo.GetID(),
-							Token:       c.Cookies("github_token"),
-						}.Serialize())
-						return err
-					})
-				if err != nil {
-					log.Print(err)
-					return err
-				}
-			}
+		// add repo to db
+		err = RepoDB.Update(func(txn *badger.Txn) error {
+			err := txn.Set(database.GetID(int32(repo.GetID())), database.Repo{
+				Name:        repo.GetName(),
+				Description: repo.GetDescription(),
+				Url:         repo.GetHTMLURL(),
+				ID:          repo.GetID(),
+				Token:       c.Cookies("github_token"),
+			}.Serialize())
+			return err
+		})
+		if err != nil {
+			log.Print(err)
+			return err
 		}
-		return c.Redirect("/dashboard")
+		return c.SendStatus(200)
 	})
 
 	DashboardGroup.Post("/adopt/", func(c *fiber.Ctx) error {
 		ctx := context.Background()
 		client := GetGithubClient(ctx, c.Cookies("github_token"))
 
-		var url struct {
-			Url string `json:"url"`
+		var id struct {
+			ID int32 `json:"id"`
 		}
 
-		err := json.Unmarshal(c.Body(), &url)
-		if err != nil {
-			log.Print(err)
-			return err
-		}
-
-		repos, err := GetAllAbandonedRepos()
+		err := json.Unmarshal(c.Body(), &id)
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 
 		err = RepoDB.Update(func(txn *badger.Txn) error {
-				for _, repo := range repos {
-					if repo.Url == url.Url {
-						err = TransferRepo(repo, client)
-						if err != nil {
-							log.Print(err)
-							return err
-						}
-						// remove repo from db
-						err := txn.Delete(database.GetID(int32(repo.ID)))
-						if err != nil {
-							log.Print(err)
-							return err
-						}
-					}
-				}
+			item, err := txn.Get(database.GetID(id.ID))
+			if err != nil {
 				return err
+			}
+			item.Value(func(val []byte) error {
+				dbrepo := database.DeserializeRepo(val)
+				err = txn.Delete(database.GetID(id.ID))
+				if err != nil {
+					return err
+				}
+				// transfer repo
+				err = TransferRepo(dbrepo, client)
+				if err != nil {
+					return err
+				}
+				return nil
 			})
+			return err
+		})
 		if err != nil {
 			log.Print(err)
 			return err
