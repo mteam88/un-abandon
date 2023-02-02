@@ -148,7 +148,6 @@ func DashboardSetup() {
 				}
 				return err
 			})
-			return err
 		if err != nil {
 			log.Print(err)
 			return err
