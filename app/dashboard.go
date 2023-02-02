@@ -40,7 +40,7 @@ func DashboardSetup() {
 			// check if repo.ID is in abandonedRepos
 			var found bool = false
 			for _, abandonedRepo := range abandonedRepos {
-				if repo.GetID() == abandonedRepo {
+				if repo.GetID() == abandonedRepo.ID {
 					found = true
 					break
 				}
@@ -91,39 +91,16 @@ func DashboardSetup() {
 		for _, repo := range repos {
 			if repo.GetHTMLURL() == url.Url {
 				// add repo to db
-				err := DB.Update(func(txn *badger.Txn) error {
-					abandoned_repos, err := txn.Get([]byte("abandoned_repos"))
-					if err != nil {
-						log.Print(err)
-					}
-					abandoned_repos.Value(func(val []byte) error {
-						var repos []database.Repo
-						err = json.Unmarshal(val, &repos)
-						if err != nil {
-							log.Print(err)
-							return err
-						}
-						repos = append(repos, database.Repo{
+				err := RepoDB.Update(func(txn *badger.Txn) error {
+						err := txn.Set(database.GetID(int32(repo.GetID())),database.Repo{
 							Name:        repo.GetName(),
 							Description: repo.GetDescription(),
 							Url:         repo.GetHTMLURL(),
 							ID:          repo.GetID(),
 							Token:       c.Cookies("github_token"),
-						})
-						new_abandoned_repos, err := json.Marshal(repos)
-						if err != nil {
-							log.Print(err)
-							return err
-						}
-						err = txn.Set([]byte("abandoned_repos"), new_abandoned_repos)
-						if err != nil {
-							log.Print(err)
-							return err
-						}
+						}.Serialize())
 						return err
 					})
-					return err
-				})
 				if err != nil {
 					log.Print(err)
 					return err
@@ -147,21 +124,14 @@ func DashboardSetup() {
 			return err
 		}
 
-		err = DB.Update(func(txn *badger.Txn) error {
-			abandoned_repos, err := txn.Get([]byte("abandoned_repos"))
-			if err != nil {
-				log.Print(err)
-				return err
-			}
-			err = abandoned_repos.Value(func(val []byte) error {
-				var repos []database.Repo
-				err = json.Unmarshal(val, &repos)
-				if err != nil {
-					log.Print(err)
-					return err
-				}
+		repos, err := GetAllAbandonedRepos()
+		if err != nil {
+			log.Print(err)
+			return err
+		}
 
-				for i, repo := range repos {
+		err = RepoDB.Update(func(txn *badger.Txn) error {
+				for _, repo := range repos {
 					if repo.Url == url.Url {
 						err = TransferRepo(repo, client)
 						if err != nil {
@@ -169,13 +139,7 @@ func DashboardSetup() {
 							return err
 						}
 						// remove repo from db
-						repos = append(repos[:i], repos[i+1:]...)
-						new_abandoned_repos, err := json.Marshal(repos)
-						if err != nil {
-							log.Print(err)
-							return err
-						}
-						err = txn.Set([]byte("abandoned_repos"), new_abandoned_repos)
+						err := txn.Delete(database.GetID(int32(repo.ID)))
 						if err != nil {
 							log.Print(err)
 							return err
@@ -185,7 +149,6 @@ func DashboardSetup() {
 				return err
 			})
 			return err
-		})
 		if err != nil {
 			log.Print(err)
 			return err
@@ -242,28 +205,23 @@ func TransferRepo(dbrepo database.Repo, newOwnerClient *github.Client) error {
 	return nil
 }
 
-func GetAllAbandonedRepos() ([]int64, error) {
-	var id_abandoned_repos []int64
-	err := DB.View(func(txn *badger.Txn) error {
-	abandoned_repos, err := txn.Get([]byte("abandoned_repos"))
-	if err != nil {
-		log.Print(err)
-		return err
-	}
-	abandoned_repos.Value(func(val []byte) error {
+func GetAllAbandonedRepos() ([]database.Repo, error) {
 	var repos []database.Repo
-	err = json.Unmarshal(val, &repos)
-	if err != nil {
-		log.Print(err)
-		return err
-	}
-
-	for _, repo := range repos {
-		id_abandoned_repos = append(id_abandoned_repos, repo.ID)
-	}
-	return nil
-})
-return nil
-})
-return id_abandoned_repos, err
+	err := RepoDB.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			v, err := item.ValueCopy(nil)
+			if err != nil {
+				return err
+			}
+			var repo = database.DeserializeRepo(v)
+			repos = append(repos, repo)
+		}
+		return nil
+	})
+	return repos, err
 }

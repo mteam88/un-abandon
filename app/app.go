@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/dgraph-io/badger/v3"
@@ -13,33 +12,12 @@ import (
 )
 
 var App *fiber.App
-var DB *badger.DB
+var UserDB *badger.DB
+var RepoDB *badger.DB
 
 func Setup() {
-	DB = database.NewBadgerDB()
-	users, err := json.Marshal([]database.User{})
-	if err != nil {
-		panic(err)
-	}
-	err = DB.Update(func(txn *badger.Txn) error {
-		err := txn.Set([]byte("users"), users)
-		return err
-	  })
-	if err != nil {
-		panic(err)
-	}
-
-	repos, err := json.Marshal([]database.Repo{})
-	if err != nil {
-		panic(err)
-	}
-	err = DB.Update(func(txn *badger.Txn) error {
-		err := txn.Set([]byte("abandoned_repos"), repos)
-		return err
-	  })
-	if err != nil {
-		panic(err)
-	}
+	UserDB = database.NewBadgerDB("users")
+	RepoDB = database.NewBadgerDB("repos")
 
 	
 	// init fiber app

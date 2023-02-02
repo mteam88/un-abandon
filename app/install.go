@@ -74,7 +74,7 @@ func InstallSetup() {
 			return err
 		}
 
-		DB.Update(func(txn *badger.Txn) error {
+		UserDB.Update(func(txn *badger.Txn) error {
 			// add token to db
 			var Users []database.User
 			rawusers, err := txn.Get([]byte("users"))

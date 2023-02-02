@@ -17,34 +17,34 @@ func ExploreSetup() {
 	ExploreGroup.Get("/", func(c *fiber.Ctx) error {
 		// get all repos from database
 		var cleanRepos []database.Repo = []database.Repo{}
-		err := DB.View(func(txn *badger.Txn) error {
-		rawRepos, err := txn.Get([]byte("abandoned_repos"))
+		
+		err := RepoDB.View(func(txn *badger.Txn) error {
+			opts := badger.DefaultIteratorOptions
+			opts.PrefetchValues = true
+			it := txn.NewIterator(opts)
+			defer it.Close()
+			for it.Rewind(); it.Valid(); it.Next() {
+				item := it.Item()
+				v, err := item.ValueCopy(nil)
+				if err != nil {
+					return err
+				}
+				var repo database.Repo
+				err = json.Unmarshal(v, &repo)
+				if err != nil {
+					return err
+				}
+				// remove sensitive fields from repo
+				repo.Token = ""
+				cleanRepos = append(cleanRepos, repo)
+			}
+			return nil
+		})
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 
-		rawRepos.Value(func(val []byte) error {
-		var repos []database.Repo
-		json.Unmarshal(val, &repos)
-
-		// clean repos object to only include name, url and description
-		for _, repo := range repos {
-			cleanRepos = append(cleanRepos, database.Repo{
-				Name:        repo.Name,
-				Description: repo.Description,
-				Url:         repo.Url,
-				ID:          repo.ID,
-			})
-		}
-		return nil
-		})
-		return nil
-		})
-		if err != nil {
-			log.Print(err)
-			return err
-		}
 		return c.Render("explore", fiber.Map{
 			"Header": "Explore",
 			"Repos":  cleanRepos,
